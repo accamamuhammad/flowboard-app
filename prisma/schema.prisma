@@ -1,5 +1,3 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
   output   = "../app/generated/prisma"
@@ -17,7 +15,6 @@ model User {
   imageUrl  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   boards    Board[]
 }
 
@@ -26,32 +23,27 @@ model Board {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
   userId    String
   user      User     @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  
   tasks     Task[]
 }
 
 model Task {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   title     String
-  status    String   @default("todo")
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  status    String    @default("todo")
+  order     Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   boardId   String
-  board     Board    @relation(fields: [boardId], references: [id], onDelete: Cascade)
-
   subtasks  Subtask[]
+  board     Board     @relation(fields: [boardId], references: [id], onDelete: Cascade)
 }
 
 model Subtask {
-  id        String   @id @default(cuid())
+  id        String  @id @default(cuid())
   title     String
-  completed Boolean  @default(false)
-
+  completed Boolean @default(false)
   taskId    String
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task      Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
