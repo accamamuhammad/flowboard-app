@@ -1,26 +1,68 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #030303;
+  --heaven:     #fefefe;
+  --lighthouse: #f4f4f4;
+  --wind:       #dfdfe2;
+  --asphalt:    #bec0bf;
+  --moor:       #708a83;
+  --newt:       #476e66;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --foreground: #ffffff;
+  --heaven:     #1c2220;
+  --lighthouse: #222927;
+  --wind:       #2e3734;
+  --asphalt:    #6b7875;
+  --moor:       #8fada7;
+  --newt:       #5e9188;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  height: 100%;
+  margin: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background: var(--heaven);
+  color: var(--newt);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+@layer utilities {
+  .bg-cs { background-color: var(--heaven); }
+  .text-cs { color: var(----newt); }
+  .border-cs { border-color: var(----newt); }
+
+  .bg-foreground { background-color: var(--foreground); }
+  .bg-heaven     { background-color: var(--heaven); }
+  .bg-lighthouse { background-color: var(--lighthouse); }
+  .bg-wind       { background-color: var(--wind); }
+  .bg-asphalt    { background-color: var(--asphalt); }
+  .bg-moor       { background-color: var(--moor); }
+  .bg-newt       { background-color: var(--newt); }
+
+  .text-foreground { color: var(--foreground); }
+  .text-heaven     { color: var(--heaven); }
+  .text-lighthouse { color: var(--lighthouse); }
+  .text-wind       { color: var(--wind); }
+  .text-asphalt    { color: var(--asphalt); }
+  .text-moor       { color: var(--moor); }
+  .text-newt       { color: var(--newt); }
+
+  .border-foreground { border-color: var(--foreground); }
+  .border-heaven     { border-color: var(--heaven); }
+  .border-lighthouse { border-color: var(--lighthouse); }
+  .border-wind       { border-color: var(--wind); }
+  .border-asphalt    { border-color: var(--asphalt); }
+  .border-moor       { border-color: var(--moor); }
+  .border-newt       { border-color: var(--newt); }
+
+  
+  .font-sans  { font-family: var(--font-sans); }
+  .font-serif { font-family: var(--font-serif); }
+  
 }
