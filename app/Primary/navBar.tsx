@@ -8,8 +8,8 @@ const NavBar = () => {
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <nav className="w-full flex flex-row items-center justify-between">
-      <h1 className="text-xl text-newt font-bold">Flowboard</h1>
+    <nav className="w-full h-20 flex flex-row items-center justify-between">
+      <h1 className="text-xl pt-1 text-newt font-bold">Dashboard</h1>
       <div className="flex flex-row gap-2.5 items-center justify-center">
         <EllipsisVertical />
         <button

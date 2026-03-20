@@ -1,15 +1,17 @@
-import { 
-  ClerkProvider, 
-  SignInButton, 
-  SignUpButton, 
-  Show, 
-  UserButton 
+import {
+  ClerkProvider,
+  SignInButton,
+  SignUpButton,
+  Show,
+  UserButton,
 } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
 import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { Clover } from "lucide-react";
 import { Metadata } from "next";
 import NavBar from "./Primary/navBar";
+import SideBar from "./Primary/sideBar";
 
 const instrumentSerif = Instrument_Serif({
   weight: "400",
@@ -40,8 +42,15 @@ export default function RootLayout({
       >
         <ClerkProvider>
           <ThemeProvider attribute="class" defaultTheme="light">
-            <header className="flex justify-end items-center px-7 py-6 gap-4 h-16">
-              <NavBar/>
+            <header className="w-full h-16 flex justify-end items-center pr-7 py-6 gap-4">
+              {/* Logo */}
+              <div className="md:min-w-72 h-20 gap-1 pt-1.5 pl-7 bg-white flex flex-row items-center justify-start">
+                <Clover size={30}/>
+                <h1 className="text-3xl text-newt font-bold">Flowboard</h1>
+              </div>
+              {/* Navigation */}
+              <NavBar />
+              {/* Clekr Account */}
               <Show when="signed-out">
                 <SignInButton mode="modal" />
                 <SignUpButton mode="modal" />
