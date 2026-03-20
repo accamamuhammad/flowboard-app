@@ -9,6 +9,7 @@ import { ThemeProvider } from "next-themes";
 import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Metadata } from "next";
+import NavBar from "./Primary/navBar";
 
 const instrumentSerif = Instrument_Serif({
   weight: "400",
@@ -39,7 +40,8 @@ export default function RootLayout({
       >
         <ClerkProvider>
           <ThemeProvider attribute="class" defaultTheme="light">
-            <header className="flex justify-end items-center p-4 gap-4 h-16">
+            <header className="flex justify-end items-center px-7 py-6 gap-4 h-16">
+              <NavBar/>
               <Show when="signed-out">
                 <SignInButton mode="modal" />
                 <SignUpButton mode="modal" />

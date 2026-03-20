@@ -1,0 +1,46 @@
+"use client";
+
+import React, { useState } from "react";
+import { EllipsisVertical, X } from "lucide-react";
+import NewTask from "./newTask";
+
+const NavBar = () => {
+  const [showModal, setShowModal] = useState(false);
+
+  return (
+    <nav className="w-full flex flex-row items-center justify-between">
+      <h1 className="text-xl text-newt font-bold">Flowboard</h1>
+      <div className="flex flex-row gap-2.5 items-center justify-center">
+        <EllipsisVertical />
+        <button
+          onClick={() => setShowModal(true)}
+          className="text-sm border px-4 py-2 bg-newt rounded-md text-heaven hover:bg-neutral-50 hover:border-green-900 hover:text-green-900 cursor-pointer"
+        >
+          Add New Task
+        </button>
+      </div>
+
+      {showModal && (
+        <div
+          className="z-50 fixed inset-0 flex items-center justify-center bg-black/50"
+          onClick={() => setShowModal(false)}
+        >
+          <div
+            className="relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-7 right-10 z-10 text-gray-400 hover:text-gray-600 cursor-pointer"
+            >
+              <X size={22} />
+            </button>
+            <NewTask onClose={() => setShowModal(false)} />
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default NavBar;
