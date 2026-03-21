@@ -28,8 +28,8 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto bg-neutral-100">
-        <div className="w-250 h-[500vh] p-10">
+      <div className="flex-1 overflow-auto bg-lighthouse">
+        <div className="w-250 h-[500vh] p-8">
           <h1 className="text-newt text-2xl">Scrollable Content</h1>
         </div>
       </div>

@@ -7,6 +7,7 @@
   --lighthouse: #f4f4f4;
   --wind:       #dfdfe2;
   --asphalt:    #bec0bf;
+    --light:       #6e948c;
   --moor:       #708a83;
   --newt:       #476e66;
 }
@@ -18,6 +19,7 @@
   --lighthouse: #222927;
   --wind:       #2e3734;
   --asphalt:    #6b7875;
+    --light:      rgb(39, 92, 82)8;
   --moor:       #8fada7;
   --newt:       #5e9188;
 }
@@ -46,6 +48,7 @@ body {
   .bg-lighthouse { background-color: var(--lighthouse); }
   .bg-wind       { background-color: var(--wind); }
   .bg-asphalt    { background-color: var(--asphalt); }
+    .bg-light { background-color: var(--light); }
   .bg-moor       { background-color: var(--moor); }
   .bg-newt       { background-color: var(--newt); }
 

@@ -47,18 +47,22 @@ export default function RootLayout({
               <div className="md:min-w-72 h-20 gap-1 mb-1.5 pt-1.5 pl-4 md:pl-7 bg-heaven flex flex-row items-center justify-start">
                 <Clover size={30} className="hidden md:block" />
                 <Clover size={22} className="block md:hidden" />
-                <h1 className="text-2xl md:text-3xl text-foreground font-bold">Flowboard</h1>
+                <h1 className="text-2xl md:text-3xl text-foreground font-bold ">
+                  Flowboard
+                </h1>
               </div>
               {/* Navigation */}
               <NavBar />
               {/* Clekr Account */}
-              <Show when="signed-out">
-                <SignInButton mode="modal" />
-                <SignUpButton mode="modal" />
-              </Show>
-              <Show when="signed-in">
-                <UserButton />
-              </Show>
+              <div className="flex flex-row min-w-fit gap-3">
+                <Show when="signed-out">
+                  <SignInButton mode="modal" />
+                  <SignUpButton mode="modal" />
+                </Show>
+                <Show when="signed-in">
+                  <UserButton />
+                </Show>
+              </div>
             </header>
             <main>{children}</main>
           </ThemeProvider>

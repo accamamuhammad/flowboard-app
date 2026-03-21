@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import AshBtn from "../UI/ashBtn";
+import { AshBtn } from "../UI/ashBtn";
 import GreenBtn from "../UI/greenBtn";
 
 const CreateBoard = () => {
