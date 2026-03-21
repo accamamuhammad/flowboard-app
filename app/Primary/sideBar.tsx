@@ -72,7 +72,7 @@ const SideBar = ({ isActive, onClose }: SidebarProps) => {
             <ThemeToggle />
             <button
               onClick={() => setStatus(true)}
-              className="hidden md:flex w-full pl-5 gap-3 items-center text-asphalt font-bold hover:text-newt transition-colors"
+              className="hidden md:flex w-full pl-18 gap-3 items-center text-asphalt font-bold hover:text-newt transition-colors"
             >
               <EyeOff size={20} />
               <span>Hide Sidebar</span>
@@ -93,7 +93,7 @@ const SideBar = ({ isActive, onClose }: SidebarProps) => {
 
       {/* 4. NEW BOARD MODAL OVERLAY */}
       <div 
-        className={`fixed inset-0 z-[60] flex items-center justify-center transition-all duration-300 ${
+        className={`fixed inset-0 z-60 flex items-center justify-center transition-all duration-300 ${
           isNewBoardOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
