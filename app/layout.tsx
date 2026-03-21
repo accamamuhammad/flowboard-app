@@ -42,11 +42,12 @@ export default function RootLayout({
       >
         <ClerkProvider>
           <ThemeProvider attribute="class" defaultTheme="light">
-            <header className="w-full h-16 flex justify-end items-center pr-7 py-6 gap-4">
+            <header className="w-full h-16 flex justify-end items-center pr-4 md:pr-7 py-6 gap-4">
               {/* Logo */}
-              <div className="md:min-w-72 h-20 gap-1 pt-1.5 pl-7 bg-white flex flex-row items-center justify-start">
-                <Clover size={30}/>
-                <h1 className="text-3xl text-newt font-bold">Flowboard</h1>
+              <div className="md:min-w-72 h-20 gap-1 mb-1.5 pt-1.5 pl-4 md:pl-7 bg-white flex flex-row items-center justify-start">
+                <Clover size={30} className="hidden md:block" />
+                <Clover size={22} className="block md:hidden" />
+                <h1 className="text-2xl md:text-3xl text-foreground font-bold">Flowboard</h1>
               </div>
               {/* Navigation */}
               <NavBar />
