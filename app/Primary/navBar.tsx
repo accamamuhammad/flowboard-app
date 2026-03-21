@@ -8,7 +8,7 @@ const NavBar = () => {
   const [showModal, setShowModal] = useState(false);
 
   return (
-    <nav className="w-full h-20 flex flex-row items-center justify-end md:justify-between z-40">
+    <nav className="w-full h-20 flex flex-row items-center justify-end md:justify-between z-50">
       <h1 className="text-xl pt-1 text-newt font-bold hidden md:block">
         Dashboard
       </h1>

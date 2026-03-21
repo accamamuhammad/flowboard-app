@@ -22,7 +22,7 @@ export default function Home() {
       {/* Toggle Button */}
       <div
         onClick={() => setToggleSideBar(!toggleSideBar)}
-        className="absolute z-50 bottom-16 left-0 cursor-pointer md:hidden bg-white border-l-0 border-2 border-newt py-1.5 pl-3 pr-1.5 shadow-lg rounded-r-full"
+        className="absolute z-50 bottom-16 left-0 cursor-pointer md:hidden bg-heaven border-l-0 border-2 border-newt py-1.5 pl-3 pr-1.5 shadow-lg rounded-r-full"
       >
         {toggleSideBar ? <ChevronLeft size={25} /> : <ChevronRight size={25} />}
       </div>

@@ -9,7 +9,7 @@ const SideBar = ({ isActive }: Active) => {
   return (
     <div
       className={`
-        bg-white overflow-hidden transition-all duration-300 ease-in-out
+        bg-heaven overflow-hidden transition-all duration-300 ease-in-out
         ${isActive 
           ? "fixed z-50 w-[90%] h-72 rounded-xl left-1/2 -translate-x-1/2 top-20 shadow-2xl" 
           : "hidden md:block md:static w-72 h-full"
