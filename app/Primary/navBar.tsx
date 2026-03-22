@@ -22,10 +22,10 @@ const NavBar = () => {
         </div>
         {/* Dropdonw */}
         <div
-          className={`${showDropDown ? "absolute w-fit px-4 rounded-md z-50 gap-2.5 py-3.5 bg-white top-16.5 right-56 flex flex-col items-start" : "hidden"}`}
+          className={`${showDropDown ? "absolute w-fit px-4 rounded-md z-50 gap-1.5 py-2 bg-heaven top-17 right-56 flex flex-col items-start" : "hidden"}`}
         >
           <p className="text-neutral-500 text-sm cursor-pointer">Edit board</p>
-          <p className="text-red-500 text-sm cursor-pointer">Delete board</p>
+          <p className="text-red-400 text-sm cursor-pointer">Delete board</p>
         </div>
         <div
           onClick={() => setShowModal(true)}
