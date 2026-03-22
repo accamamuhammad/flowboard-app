@@ -28,7 +28,7 @@ const SideBar = ({ isActive, onClose }: SidebarProps) => {
       {/* 2. Main Sidebar */}
       <aside
         className={`
-          transition-all duration-500 ease-in-out overflow-hidden flex flex-col bg-heaven
+          transition-all pt-2 duration-500 ease-in-out overflow-hidden flex flex-col bg-heaven
           ${
             isActive
               ? "fixed z-50 w-[90%] h-auto max-h-[80vh] rounded-xl left-[5%] -translate-x-1/2 top-20 shadow-2xl"

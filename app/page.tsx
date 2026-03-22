@@ -28,7 +28,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <section className="flex-1 overflow-auto bg-lighthouse">
+      <section className="flex-1 pt-2 overflow-auto bg-lighthouse">
         <div className="w-fit lg:w-full min-h-[90vh] max-h-[500vh] p-8 flex gap-10 flex-row items-start justify-center">
           {/* Todo Column */}
           <div className="xl:w-[33%] flex gap-5 flex-col items-start justify-center">
