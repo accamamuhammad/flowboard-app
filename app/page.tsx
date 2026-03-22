@@ -28,11 +28,52 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto bg-lighthouse">
-        <div className="w-250 h-[500vh] p-8">
-          <h1 className="text-newt text-2xl">Scrollable Content</h1>
+      <section className="flex-1 overflow-auto bg-lighthouse">
+        <div className="w-fit lg:w-full min-h-[90vh] max-h-[500vh] p-8 flex gap-10 flex-row items-start justify-center">
+          {/* Todo Column */}
+          <div className="xl:w-[33%] flex gap-5 flex-col items-start justify-center">
+            <p className="font-medium text-base tracking-widest text-asphalt">
+              Todo (5)
+            </p>
+            <div className="w-72 xl:w-full bg-heaven rounded-md flex flex-col p-5 gap-2.5 items-start justify-center">
+              <h1 className="text-foreground font-bold">
+                Build UI for Onboarding Form
+              </h1>
+              <span className="text-neutral-500 text-sm font-bold">
+                1 of 3 substacks
+              </span>
+            </div>
+          </div>
+          {/* Doing Column */}
+          <div className="xl:w-[33%] flex gap-5 flex-col items-start justify-center">
+            <p className="font-medium text-base tracking-widest text-asphalt">
+              Doing (7)
+            </p>
+            <div className="w-72 xl:w-full bg-heaven rounded-md flex flex-col p-5 gap-2.5 items-start justify-center">
+              <h1 className="text-foreground font-bold">
+                Build UI for Onboarding Form
+              </h1>
+              <span className="text-neutral-500 text-sm font-bold">
+                1 of 3 substacks
+              </span>
+            </div>
+          </div>
+          {/* Done Column */}
+          <div className="xl:w-[33%] flex gap-5 flex-col items-start justify-center">
+            <p className="font-medium text-base tracking-widest text-asphalt">
+              Done (10)
+            </p>
+            <div className="w-72 xl:w-full bg-heaven rounded-md flex flex-col p-5 gap-2.5 items-start justify-center">
+              <h1 className="text-foreground font-bold">
+                Build UI for Onboarding Form
+              </h1>
+              <span className="text-neutral-500 text-sm font-bold">
+                1 of 3 substacks
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }
