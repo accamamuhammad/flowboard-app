@@ -10,8 +10,13 @@ interface SidebarProps {
 }
 
 const SideBar = ({ isActive, onClose }: SidebarProps) => {
-  const [status, setStatus] = useState<boolean>(false); // Sidebar hidden/shown state
-  const [isNewBoardOpen, setIsNewBoardOpen] = useState<boolean>(false); // Modal state
+  const [status, setStatus] = useState<boolean>(false);
+  const [isNewBoardOpen, setIsNewBoardOpen] = useState<boolean>(false);
+  const [boards, setBoards] = useState<string[]>([
+    "Agency Launch",
+    "Marketing Plan",
+    "Roadmap",
+  ]);
 
   return (
     <>
@@ -52,8 +57,9 @@ const SideBar = ({ isActive, onClose }: SidebarProps) => {
                   <span className="font-bold">Agency Launch</span>
                 </li>
 
-                {["Marketing Plan", "Roadmap"].map((board) => (
+                {boards.map((board) => (
                   <li
+                    onClick={() => console.log(board)}
                     key={board}
                     className="w-[90%] flex items-center gap-3 text-asphalt hover:bg-green-50 hover:text-newt py-3.5 pl-5 rounded-r-full cursor-pointer transition-all"
                   >
