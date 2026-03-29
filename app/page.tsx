@@ -123,6 +123,7 @@ export default function BoardsPage() {
         boards={boards}
         onNewBoard={() => setModal(true)}
         onToggleSidebar={() => setSidebar((o) => !o)}
+        sidebarOpen={sidebarOpen}
       />
 
       <CreateBoardModal
