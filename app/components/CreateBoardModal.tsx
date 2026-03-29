@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { X } from "lucide-react";
 import type { BoardColor } from "@/types/flowboard";
-import { boardColors } from "@/lib/boardColors";
 
 interface CreateBoardModalProps {
   open: boolean;
@@ -10,7 +10,7 @@ interface CreateBoardModalProps {
   onCreate: (data: { name: string; description: string; emoji: string; color: BoardColor }) => void;
 }
 
-const EMOJIS = ["📋", "🗺️", "🎨", "🚀", "💡", "⚡", "🐞", "📊", "🧪", "📌", "🏁", "🔧"];
+const QUICK_EMOJIS = ["📋", "🗺️", "🎨", "🚀", "💡", "⚡", "🐞", "📊", "🧪", "📌", "🏁", "🔧", "🎯", "📝", "🔥", "💎"];
 
 const COLORS: { value: BoardColor; hex: string; label: string }[] = [
   { value: "amber",  hex: "#c8862a", label: "Amber"  },
@@ -55,7 +55,7 @@ export default function CreateBoardModal({ open, onClose, onCreate }: CreateBoar
       <div className="w-full max-w-[480px] rounded-[20px] overflow-hidden flex flex-col
         bg-white shadow-modal animate-modal-in">
 
-        {/* Colour strip — updates as colour changes */}
+        {/* Colour strip */}
         <div className="h-1.5 transition-colors duration-300" style={{ background: activeHex }} />
 
         {/* Header */}
@@ -71,9 +71,9 @@ export default function CreateBoardModal({ open, onClose, onCreate }: CreateBoar
           </div>
           <button onClick={onClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center mt-0.5
-              text-ink-muted hover:bg-paper-dark hover:text-ink transition-colors duration-150 text-lg"
+              text-ink-muted hover:bg-paper-dark hover:text-ink transition-colors duration-150"
             aria-label="Close">
-            ×
+            <X size={16} />
           </button>
         </div>
 
@@ -151,23 +151,39 @@ export default function CreateBoardModal({ open, onClose, onCreate }: CreateBoar
             <label className="block text-[11.5px] font-semibold text-ink-soft mb-2 tracking-wide uppercase">
               Icon
             </label>
-            <div className="grid grid-cols-6 gap-1.5">
-              {EMOJIS.map((e) => (
-                <button
-                  key={e}
-                  onClick={() => setEmoji(e)}
-                  className="h-10 rounded-xl flex items-center justify-center text-xl
-                    border-[1.5px] transition-all duration-150 bg-paper border-subtle
-                    hover:bg-paper-dark"
-                  style={
-                    emoji === e
-                      ? { background: `${activeHex}18`, borderColor: activeHex, transform: "scale(1.08)" }
-                      : {}
-                  }
-                >
-                  {e}
-                </button>
-              ))}
+
+            {/* Custom emoji input */}
+            <div className="flex items-center gap-2">
+              <div
+                className="w-11 h-11 rounded-xl border-[1.5px] flex items-center justify-center
+                  text-2xl flex-shrink-0 transition-colors duration-150"
+                style={{ background: `${activeHex}18`, borderColor: activeHex }}
+              >
+                {emoji}
+              </div>
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Paste or type any emoji…"
+                  maxLength={8}
+                  className="w-full rounded-[10px] px-3.5 py-2.5 text-[14px] text-ink
+                    bg-paper border border-soft outline-none transition-all duration-150
+                    placeholder:text-ink-faint
+                    focus:bg-white focus:border-amber-fb focus:ring-2 focus:ring-amber-fb/10"
+                  onChange={(e) => {
+                    // Extract the first emoji/character from the pasted/typed value
+                    const val = e.target.value.trim();
+                    if (!val) return;
+                    // Use Intl.Segmenter to get the first grapheme cluster (handles multi-codepoint emoji)
+                    const segmenter = new Intl.Segmenter();
+                    const first = [...segmenter.segment(val)][0]?.segment;
+                    if (first) setEmoji(first);
+                  }}
+                />
+                <p className="text-[10.5px] text-ink-faint mt-1 pl-1">
+                  Type an emoji, or paste one from your emoji picker (Win+. / Cmd+Ctrl+Space)
+                </p>
+              </div>
             </div>
           </div>
 

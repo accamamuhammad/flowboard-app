@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { boardColors } from "@/lib/boardColors";
 import type { Board } from "@/types/flowboard";
+import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 
 interface SidebarProps {
   boards: Board[];
@@ -126,20 +127,7 @@ export default function Sidebar({
           ))}
         </div>
 
-        {/* User footer */}
-        <div className="px-3.5 mt-auto pt-3.5" style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-          <button className="flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] w-full transition-colors duration-150">
-            <div
-              className="w-7 h-7 rounded-full text-[11px] font-bold flex items-center justify-center flex-shrink-0"
-              style={{ background: "#c8862a", color: "#1a1714" }}
-            >
-              {userInitials}
-            </div>
-            <span className="text-[12.5px]" style={{ color: "rgba(247,243,238,0.7)" }}>
-              {userName}
-            </span>
-          </button>
-        </div>
+      
       </aside>
     </>
   );

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Plus, X } from "lucide-react";
 import type { TaskItem } from "@/types/flowboard";
 
 interface AddTaskModalProps {
   open: boolean;
   boardName: string;
-  boardColor: string;   // still hex — dynamic per-board, can't be a static token
+  boardColor: string;
   onClose: () => void;
   onAdd: (task: TaskItem) => void;
 }
@@ -73,7 +74,7 @@ export default function AddTaskModal({ open, boardName, boardColor, onClose, onA
       <div className="w-full max-w-[480px] rounded-[20px] overflow-hidden flex flex-col
         bg-white shadow-modal animate-modal-in">
 
-        {/* Colour strip — dynamic board colour */}
+        {/* Colour strip */}
         <div className="h-1.5" style={{ background: boardColor }} />
 
         {/* Header */}
@@ -89,9 +90,9 @@ export default function AddTaskModal({ open, boardName, boardColor, onClose, onA
           </div>
           <button onClick={onClose}
             className="w-8 h-8 rounded-lg flex items-center justify-center mt-0.5
-              text-ink-muted hover:bg-paper-dark hover:text-ink transition-colors duration-150 text-lg"
+              text-ink-muted hover:bg-paper-dark hover:text-ink transition-colors duration-150"
             aria-label="Close">
-            ×
+            <X size={16} />
           </button>
         </div>
 
@@ -174,10 +175,10 @@ export default function AddTaskModal({ open, boardName, boardColor, onClose, onA
                       style={{ background: boardColor }} />
                     <span className="text-[12.5px] text-ink-deep flex-1">{sub.label}</span>
                     <button onClick={() => removeSubtask(sub.id)}
-                      className="text-ink-muted hover:text-rose-fb text-base
+                      className="text-ink-muted hover:text-rose-fb flex items-center justify-center
                         opacity-0 group-hover/sub:opacity-100 transition-all duration-150"
                       aria-label="Remove subtask">
-                      ×
+                      <X size={14} />
                     </button>
                   </div>
                 ))}
@@ -186,7 +187,7 @@ export default function AddTaskModal({ open, boardName, boardColor, onClose, onA
 
             <div className="flex items-center gap-2 rounded-[10px] px-3 py-2
               bg-paper border border-dashed border-medium">
-              <span className="text-ink-muted text-sm">+</span>
+              <Plus size={14} className="text-ink-muted flex-shrink-0" />
               <input
                 type="text"
                 value={newSubtask}
