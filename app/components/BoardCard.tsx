@@ -5,6 +5,7 @@ import { MoreHorizontal, Plus, Check, Pencil, Trash2, Loader2 } from "lucide-rea
 import type { Board, Task } from "@/types/flowboard";
 import { TASK_STATUSES } from "@/types/flowboard";
 import { deleteBoard } from "@/actions/boards";
+import { deleteTask, updateTask } from "@/actions/tasks";
 import AddTaskModal from "./AddTaskModal";
 
 const BOARD_COLORS = ["#c8862a", "#3a7d5c", "#2d5f8a", "#b94040", "#7a5da8"];
@@ -33,26 +34,48 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
   const doneCount = tasks.filter((t) => t.status === "done").length;
   const progress  = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
 
+  // ── Task saved (add or edit) ────────────────────────────────
   function handleTaskSaved(task: Task) {
     const safe = { ...task, subtasks: task.subtasks ?? [] };
     setTasks((prev) => {
       const exists = prev.find((t) => t.id === safe.id);
-      return exists ? prev.map((t) => (t.id === safe.id ? safe : t)) : [...prev, safe];
+      return exists ? prev.map((t) => t.id === safe.id ? safe : t) : [...prev, safe];
     });
     onTaskSaved(board.id, safe);
   }
 
+  // ── Toggle task done/todo ───────────────────────────────────
   function handleToggleTask(e: React.MouseEvent, task: Task) {
     e.stopPropagation();
     const next = task.status === "done" ? "todo" : "done";
+    // Optimistic
     setTasks((prev) => prev.map((t) => t.id === task.id ? { ...t, status: next } : t));
+    startTransition(async () => {
+      try {
+        await updateTask(task.id, { status: next });
+      } catch {
+        // Rollback on failure
+        setTasks((prev) => prev.map((t) => t.id === task.id ? { ...t, status: task.status } : t));
+      }
+    });
   }
 
-  function handleDeleteTaskLocal(e: React.MouseEvent, taskId: string) {
+  // ── Delete task ─────────────────────────────────────────────
+  function handleDeleteTask(e: React.MouseEvent, taskId: string) {
     e.stopPropagation();
+    // Optimistic remove
     setTasks((prev) => prev.filter((t) => t.id !== taskId));
+    startTransition(async () => {
+      try {
+        await deleteTask(taskId);
+      } catch {
+        // Rollback: re-fetch would be ideal but just show alert for now
+        alert("Failed to delete task. Please refresh.");
+      }
+    });
   }
 
+  // ── Delete board ────────────────────────────────────────────
   function handleDeleteBoard() {
     if (!confirm(`Delete "${board.name}"? This will permanently remove the board and all its tasks.`)) return;
     setMenuOpen(false);
@@ -61,7 +84,7 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
       try {
         await deleteBoard(board.id);
         onBoardDeleted(board.id);
-      } catch (err) {
+      } catch {
         setDeleting(false);
         alert("Failed to delete board. Please try again.");
       }
@@ -97,6 +120,7 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
             <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
           </div>
         )}
+
         {/* Left accent bar */}
         <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, borderRadius: "18px 0 0 18px", background: color, pointerEvents: "none" }} />
 
@@ -115,7 +139,7 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
               </p>
             </div>
 
-            {/* Options menu */}
+            {/* ⋯ options menu */}
             <div style={{ position: "relative", flexShrink: 0 }}>
               <button
                 suppressHydrationWarning
@@ -134,7 +158,7 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
                   <div style={{ position: "absolute", right: 0, top: 32, zIndex: 20, background: "white", borderRadius: 12, border: "1px solid rgba(26,23,20,0.08)", boxShadow: "0 8px 24px rgba(26,23,20,0.14)", width: 140, overflow: "hidden", padding: "4px 0" }}>
                     <button
                       onClick={() => { setMenuOpen(false); onBoardEdit(board); }}
-                      className="flex items-center gap-2 w-full transition-colors duration-100"
+                      className="flex items-center gap-2 w-full"
                       style={{ padding: "8px 12px", fontSize: 13, color: "#5a5148", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
                       onMouseEnter={(e) => (e.currentTarget.style.background = "#f7f3ee")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
@@ -143,7 +167,7 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
                     </button>
                     <button
                       onClick={handleDeleteBoard}
-                      className="flex items-center gap-2 w-full transition-colors duration-100"
+                      className="flex items-center gap-2 w-full"
                       style={{ padding: "8px 12px", fontSize: 13, color: "#b94040", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
                       onMouseEnter={(e) => (e.currentTarget.style.background = "#fce8e8")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
@@ -156,7 +180,7 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
             </div>
           </div>
 
-          {/* Progress */}
+          {/* Progress bar */}
           <div className="flex items-center gap-2.5" style={{ marginTop: 14 }}>
             <div style={{ flex: 1, height: 5, borderRadius: 99, overflow: "hidden", background: "#ede8e0" }}>
               <div style={{ height: "100%", borderRadius: 99, width: `${progress}%`, background: color, transition: "width 0.7s ease" }} />
@@ -179,20 +203,15 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
                   key={task.id}
                   suppressHydrationWarning
                   className="group/task flex items-center gap-2"
-                  style={{ padding: "5px 8px", borderRadius: 8, minHeight: 28, transition: "background 0.1s", cursor: "default" }}
+                  style={{ padding: "5px 8px", borderRadius: 8, minHeight: 30, transition: "background 0.1s", cursor: "default" }}
                   onMouseEnter={(e) => (e.currentTarget.style.background = "#f7f3ee")}
                   onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                 >
-                  {/* Checkbox */}
+                  {/* Checkbox — toggles status in DB */}
                   <button
                     suppressHydrationWarning
                     onClick={(e) => handleToggleTask(e, task)}
-                    style={{
-                      width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${done ? color : "#cdc6bc"}`,
-                      background: done ? color : "white", color: done ? "white" : "transparent",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      flexShrink: 0, transition: "all 0.15s", cursor: "pointer",
-                    }}
+                    style={{ width: 16, height: 16, borderRadius: 4, border: `1.5px solid ${done ? color : "#cdc6bc"}`, background: done ? color : "white", color: done ? "white" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s", cursor: "pointer" }}
                   >
                     <Check size={9} strokeWidth={2.5} />
                   </button>
@@ -209,26 +228,28 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
                     </span>
                   )}
 
-                  {/* Status — on hover */}
+                  {/* Status badge — hover only */}
                   <span className="opacity-0 group-hover/task:opacity-100 transition-opacity" style={{ fontSize: 10, fontWeight: 500, padding: "1px 6px", borderRadius: 6, background: `${statusInfo.color}18`, color: statusInfo.color, flexShrink: 0 }}>
                     {statusInfo.label}
                   </span>
 
-                  {/* Edit / Delete — on hover */}
+                  {/* Edit + Delete — hover only */}
                   <div className="opacity-0 group-hover/task:opacity-100 transition-opacity flex items-center gap-0.5 flex-shrink-0">
                     <button
                       onClick={(e) => { e.stopPropagation(); setEditTask(task); setModal(true); }}
                       style={{ width: 20, height: 20, borderRadius: 4, border: "none", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "#9c9188", cursor: "pointer", transition: "background 0.1s, color 0.1s" }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = "#ede8e0"; e.currentTarget.style.color = "#1a1714"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9c9188"; }}
+                      aria-label="Edit task"
                     >
                       <Pencil size={10} />
                     </button>
                     <button
-                      onClick={(e) => handleDeleteTaskLocal(e, task.id)}
+                      onClick={(e) => handleDeleteTask(e, task.id)}
                       style={{ width: 20, height: 20, borderRadius: 4, border: "none", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "#9c9188", cursor: "pointer", transition: "background 0.1s, color 0.1s" }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = "#fce8e8"; e.currentTarget.style.color = "#b94040"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#9c9188"; }}
+                      aria-label="Delete task"
                     >
                       <Trash2 size={10} />
                     </button>
@@ -248,7 +269,7 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
             )}
           </div>
 
-          {/* Add task */}
+          {/* Add task trigger */}
           <button
             suppressHydrationWarning
             onClick={(e) => { e.stopPropagation(); setEditTask(null); setModal(true); }}
@@ -263,7 +284,9 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
         </div>
       </div>
 
+      {/* Add / Edit Task Modal */}
       <AddTaskModal
+        key={`${modalOpen}-${editingTask?.id ?? "new"}`}
         open={modalOpen}
         boardId={board.id}
         boardName={board.name}
