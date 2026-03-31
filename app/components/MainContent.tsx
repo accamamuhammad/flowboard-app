@@ -1,81 +1,74 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import type { Board } from "@/types/flowboard";
+import type { Board, Task } from "@/types/flowboard";
 import BoardCard, { AddBoardCard } from "./BoardCard";
-import AuthCard from "./AuthCard";
 
 interface MainContentProps {
   boards: Board[];
   onNewBoard: () => void;
+  onBoardEdit: (board: Board) => void;
+  onBoardDeleted: (id: string) => void;
+  onTaskSaved: (boardId: string, task: Task) => void;
   onToggleSidebar: () => void;
   sidebarOpen: boolean;
-  onBoardClick?: (board: Board) => void;
 }
 
-export default function MainContent({
-  boards,
-  onNewBoard,
-  onToggleSidebar,
-  sidebarOpen,
-  onBoardClick,
-}: MainContentProps) {
+export default function MainContent({ boards, onNewBoard, onBoardEdit, onBoardDeleted, onTaskSaved, onToggleSidebar, sidebarOpen }: MainContentProps) {
   return (
-    <main className="flex-1 px-6 lg:px-12 py-11 overflow-y-auto min-w-0 animate-rise">
+    <main style={{ flex: 1, overflowY: "auto", minWidth: 0, padding: "44px 48px 60px" }}>
+
       {/* Page header */}
-      <div className="flex items-end justify-between mb-10">
+      <div className="flex items-end justify-between" style={{ marginBottom: 40 }}>
         <div className="flex items-center gap-3">
-          {/* Sidebar toggle — tablet only, hidden when sidebar is open */}
           {!sidebarOpen && (
             <div
               onClick={onToggleSidebar}
-              className="w-16 h-12 rounded-r-full bg-paper shadow-pill absolute left-0 bottom-10 z-50 flex items-center justify-center pr-1.5 text-sm font-bold cursor-pointer lg:hidden text-ink hover:bg-paper-dark transition-colors duration-150"
-              aria-label="Toggle sidebar"
+              className="lg:hidden"
+              style={{ position: "absolute", left: 0, bottom: 40, zIndex: 50, width: 64, height: 48, borderRadius: "0 999px 999px 0", background: "#f7f3ee", boxShadow: "0 2px 8px rgba(26,23,20,0.15)", display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: 6, fontSize: 13, fontWeight: 700, color: "#1a1714", cursor: "pointer" }}
             >
               Open
             </div>
           )}
-
           <div>
-            <p className="text-[11px] uppercase tracking-[0.1em] text-ink-muted mb-1.5">
-              Workspace
-            </p>
-            <h1 className="font-display text-3xl lg:text-[34px] font-semibold tracking-tight leading-tight text-ink">
-              Your <em className="not-italic text-amber-fb">Boards</em>
+            <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9c9188", marginBottom: 6 }}>Workspace</p>
+            <h1 style={{ fontFamily: "'Lora', serif", fontSize: 34, fontWeight: 600, letterSpacing: "-0.6px", lineHeight: 1.1, color: "#1a1714" }}>
+              Your <em style={{ fontStyle: "italic", color: "#c8862a" }}>Boards</em>
             </h1>
           </div>
         </div>
 
-        <div className="flex flex-row items-center justify-center gap-2.5">
-          {/* New Board button */}
-          <button
-            suppressHydrationWarning
-            onClick={onNewBoard}
-            className="flex items-center justify-center gap-1.5 font-semibold font-body rounded-lg transition-all duration-150 hover:-translate-y-px bg-ink text-paper hover:bg-amber-fb hover:text-ink w-10 h-10 lg:w-auto lg:h-auto lg:px-4 lg:py-2.5 bg-amber-50"
-            aria-label="New board"
-          >
-            <Plus size={16} />
-            <span className="hidden lg:inline text-[13.5px]">New Board</span>
-          </button>
-                  {/* Auth Card */}
-        <AuthCard />
-        </div>
+        <button
+          suppressHydrationWarning
+          onClick={onNewBoard}
+          className="flex items-center justify-center gap-1.5 transition-all duration-150 hover:-translate-y-px"
+          style={{ background: "#1a1714", color: "#f7f3ee", border: "none", borderRadius: 9, padding: "9px 18px", fontSize: 13.5, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+          onMouseEnter={(e) => { e.currentTarget.style.background = "#c8862a"; e.currentTarget.style.color = "#1a1714"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.background = "#1a1714"; e.currentTarget.style.color = "#f7f3ee"; }}
+        >
+          <Plus size={16} />
+          <span>New Board</span>
+        </button>
       </div>
 
       {/* Section label */}
-      <div className="flex items-center gap-2.5 mb-4">
-        <span className="text-[10.5px] uppercase tracking-[0.1em] text-ink-muted whitespace-nowrap">
+      <div className="flex items-center gap-2.5" style={{ marginBottom: 16 }}>
+        <span style={{ fontSize: 10.5, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9c9188", whiteSpace: "nowrap" }}>
           {boards.length} board{boards.length !== 1 ? "s" : ""}
         </span>
-        <div className="flex-1 h-px bg-ink/[0.08]" />
+        <div style={{ flex: 1, height: 1, background: "rgba(26,23,20,0.08)" }} />
       </div>
 
       {/* Boards grid */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(264px,1fr))] gap-[18px] mb-12">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(264px, 1fr))", gap: 18, marginBottom: 48 }}>
         {boards.map((board) => (
-          <div key={board.id} className="group">
-            <BoardCard board={board} onClick={() => onBoardClick?.(board)} />
-          </div>
+          <BoardCard
+            key={board.id}
+            board={board}
+            onBoardEdit={onBoardEdit}
+            onBoardDeleted={onBoardDeleted}
+            onTaskSaved={onTaskSaved}
+          />
         ))}
         <AddBoardCard onClick={onNewBoard} />
       </div>

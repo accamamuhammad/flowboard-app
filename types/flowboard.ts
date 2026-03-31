@@ -1,36 +1,48 @@
 // src/types/flowboard.ts
-// Shared TypeScript types used across all Flowboard components.
+// Mirrors schema.prisma exactly — no extra UI-only fields.
 
-export type BoardColor = "amber" | "green" | "blue" | "rose" | "purple";
-
-export interface TaskItem {
+export interface Subtask {
   id: string;
-  label: string;
-  done: boolean;
-  subtaskCount: number;   // total subtasks
-  subtaskDone: number;    // completed subtasks
+  title: string;
+  completed: boolean;
+  taskId: string;
 }
 
-export interface Member {
+export interface Task {
   id: string;
-  initials: string;
-  color: string; // tailwind bg color class, e.g. "bg-amber-pale"
+  title: string;
+  status: string; 
+  label: string;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+  boardId: string;
+  subtasks: Subtask[];
 }
 
 export interface Board {
   id: string;
   name: string;
   description: string;
-  emoji: string;
-  color: BoardColor;
-  progress: number;       // 0–100
-  tasks: TaskItem[];
-  members: Member[];
+  progress: string;
+  createdAt: Date;
+  updatedAt: Date;
+  userId: string;
+  color: string;
+  tasks: Task[];
 }
 
-export interface NavItem {
+// Lightweight version used in sidebar board list
+export type BoardSummary = Pick<Board, "id" | "name">;
+
+export type TaskStatus = "todo" | "in_progress" | "done";
+
+export const TASK_STATUSES: {
+  value: TaskStatus;
   label: string;
-  icon: string;
-  href: string;
-  active?: boolean;
-}
+  color: string;
+}[] = [
+  { value: "todo", label: "To Do", color: "#9c9188" },
+  { value: "in_progress", label: "In Progress", color: "#c8862a" },
+  { value: "done", label: "Done", color: "#3a7d5c" },
+];

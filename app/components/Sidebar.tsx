@@ -1,16 +1,17 @@
 "use client";
 
-// src/components/Sidebar.tsx
-// - Desktop (≥1024px): always visible, static in layout
-// - Tablet (<1024px): hidden by default, slides in as overlay when open
-//   controlled via `isOpen` + `onClose` props passed from the page
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
-import { boardColors } from "@/lib/boardColors";
+import { LayoutGrid, Star, Clock, CheckSquare } from "lucide-react";
 import type { Board } from "@/types/flowboard";
-import { Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
+
+const BOARD_COLORS = ["#c8862a", "#3a7d5c", "#2d5f8a", "#b94040", "#7a5da8"];
+function getBoardColor(id: string) {
+  let hash = 0;
+  for (const ch of id) hash = (hash * 31 + ch.charCodeAt(0)) & 0xffffffff;
+  return BOARD_COLORS[Math.abs(hash) % BOARD_COLORS.length];
+}
 
 interface SidebarProps {
   boards: Board[];
@@ -21,25 +22,31 @@ interface SidebarProps {
 }
 
 const NAV_ITEMS = [
-  { label: "All Boards", icon: "⊞", href: "/boards" },
-  { label: "Starred",    icon: "✦", href: "/starred" },
-  { label: "Recent",     icon: "◷", href: "/recent" },
-  { label: "My Tasks",   icon: "◈", href: "/tasks" },
+  { label: "All Boards", icon: LayoutGrid, href: "/boards"  },
+  { label: "Starred",    icon: Star,        href: "/starred" },
+  { label: "Recent",     icon: Clock,       href: "/recent"  },
+  { label: "My Tasks",   icon: CheckSquare, href: "/tasks"   },
 ];
 
-export default function Sidebar({
-  boards,
-  userName = "Alex Okafor",
-  userInitials = "AO",
-  isOpen,
-  onClose,
-}: SidebarProps) {
+// All colours as plain hex — avoids Tailwind token resolution issues
+const S = {
+  bg:         "#1a1714",
+  border:     "rgba(255,255,255,0.08)",
+  divider:    "rgba(255,255,255,0.07)",
+  label:      "rgba(247,243,238,0.28)",
+  text:       "rgba(247,243,238,0.55)",
+  textHover:  "#f7f3ee",
+  board:      "rgba(247,243,238,0.45)",
+  user:       "rgba(247,243,238,0.70)",
+  activeBg:   "#c8862a",
+  activeText: "#1a1714",
+  hoverBg:    "rgba(255,255,255,0.07)",
+};
+
+export default function Sidebar({ boards, userName = "Alex Okafor", userInitials = "AO", isOpen, onClose }: SidebarProps) {
   const pathname = usePathname();
 
-  // Close sidebar on route change (tablet)
   useEffect(() => { onClose(); }, [pathname]);
-
-  // Lock body scroll when overlay is open on tablet
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -47,87 +54,112 @@ export default function Sidebar({
 
   return (
     <>
-      {/* ── Backdrop (tablet only) ── */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/40 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-20 lg:hidden"
+          style={{ background: "rgba(26,23,20,0.4)", backdropFilter: "blur(4px)" }}
           onClick={onClose}
         />
       )}
 
-      {/* ── Sidebar panel ── */}
       <aside
-        className={`
-          fixed top-0 left-0 z-30 h-full
-          lg:static lg:z-auto lg:translate-x-0 lg:flex
-          flex flex-col py-7 overflow-y-auto
-          transition-transform duration-300 ease-in-out
-          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
-        `}
-        style={{ width: "200px", minWidth: "200px", background: "#1a1714" }}
+        className={`fixed top-0 left-0 z-30 h-full flex flex-col overflow-y-auto lg:static lg:z-auto lg:translate-x-0 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        style={{ width: 200, minWidth: 200, background: S.bg, paddingTop: 28, paddingBottom: 24 }}
       >
         {/* Logo */}
-        <div className="px-6 pb-6 mb-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-          <div className="font-display text-xl font-semibold tracking-tight" style={{ color: "#f7f3ee" }}>
+        <div style={{ padding: "0 24px 24px", borderBottom: `1px solid ${S.border}`, marginBottom: 20 }}>
+          <div style={{ fontFamily: "'Lora', serif", fontSize: 20, fontWeight: 600, color: "#f7f3ee", letterSpacing: "-0.3px" }}>
             Flowboard
           </div>
-          <div className="text-[10.5px] mt-0.5 tracking-wider" style={{ color: "rgba(247,243,238,0.35)" }}>
+          <div style={{ fontSize: 10.5, color: S.label, marginTop: 2, letterSpacing: "0.04em" }}>
             Task &amp; board manager
           </div>
         </div>
 
-        {/* Main nav */}
-        <div className="px-3.5 mb-2">
-          <div className="text-[9.5px] uppercase tracking-widest px-2.5 mb-1.5"
-            style={{ color: "rgba(247,243,238,0.28)" }}>
+        {/* Nav */}
+        <div style={{ padding: "0 14px", marginBottom: 8 }}>
+          <div style={{ fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.1em", color: S.label, padding: "0 10px", marginBottom: 6 }}>
             Menu
           </div>
-          {NAV_ITEMS.map((item) => {
-            const active = pathname === item.href;
+          {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
+            const active = pathname === href;
             return (
               <Link
-                key={item.href}
-                href={item.href}
-                className="flex items-center gap-2.5 px-2.5 py-2 rounded-[7px] text-[13px] transition-colors duration-150 select-none"
-                style={
-                  active
-                    ? { background: "#c8862a", color: "#1a1714", fontWeight: 600 }
-                    : { color: "rgba(247,243,238,0.55)" }
-                }
+                key={href}
+                href={href}
+                className="flex items-center gap-2.5 rounded-[7px] select-none transition-colors duration-150"
+                style={{
+                  padding: "8px 10px",
+                  fontSize: 13,
+                  background: active ? S.activeBg : "transparent",
+                  color: active ? S.activeText : S.text,
+                  fontWeight: active ? 600 : 400,
+                }}
+                onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = S.hoverBg; e.currentTarget.style.color = S.textHover; } }}
+                onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = S.text; } }}
               >
-                <span className="w-4 text-center text-sm">{item.icon}</span>
-                {item.label}
+                <Icon size={15} style={{ flexShrink: 0 }} />
+                {label}
               </Link>
             );
           })}
         </div>
 
         {/* Divider */}
-        <div className="mx-6 my-3.5" style={{ height: "1px", background: "rgba(255,255,255,0.07)" }} />
+        <div style={{ height: 1, background: S.divider, margin: "14px 24px" }} />
 
         {/* Board list */}
-        <div className="px-3.5 flex-1 overflow-hidden">
-          <div className="text-[9.5px] uppercase tracking-widest px-2.5 mb-1.5"
-            style={{ color: "rgba(247,243,238,0.28)" }}>
-            Boards
+        <div style={{ padding: "0 14px", flex: 1, overflowY: "auto" }}>
+          <div className="flex items-center justify-between" style={{ padding: "0 10px", marginBottom: 6 }}>
+            <span style={{ fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.1em", color: S.label }}>Boards</span>
+            {boards.length > 0 && (
+              <span style={{ fontSize: 9.5, color: S.label, fontVariantNumeric: "tabular-nums" }}>{boards.length}</span>
+            )}
           </div>
-          {boards.map((board) => (
-            <Link
-              key={board.id}
-              href={`/boards/${board.id}`}
-              className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-[7px] text-[12.5px] transition-colors duration-150 whitespace-nowrap overflow-hidden text-ellipsis"
-              style={{ color: "rgba(247,243,238,0.45)" }}
-            >
-              <span
-                className="w-[7px] h-[7px] rounded-full flex-shrink-0"
-                style={{ background: boardColors[board.color].hex }}
-              />
-              {board.name}
-            </Link>
-          ))}
+
+          {boards.length === 0 ? (
+            <div style={{ padding: "8px 10px", fontSize: 12, color: S.label, fontStyle: "italic" }}>No boards yet</div>
+          ) : (
+            boards.map((board) => {
+              const active = pathname === `/boards/${board.id}`;
+              return (
+                <Link
+                  key={board.id}
+                  href={`/boards/${board.id}`}
+                  className="flex items-center gap-2.5 rounded-[7px] transition-colors duration-150 overflow-hidden"
+                  style={{
+                    padding: "6px 10px",
+                    fontSize: 12.5,
+                    color: active ? "#f7f3ee" : S.board,
+                    background: active ? "rgba(255,255,255,0.09)" : "transparent",
+                    whiteSpace: "nowrap",
+                    textOverflow: "ellipsis",
+                  }}
+                  onMouseEnter={(e) => { if (!active) { e.currentTarget.style.color = S.textHover; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; } }}
+                  onMouseLeave={(e) => { if (!active) { e.currentTarget.style.color = S.board; e.currentTarget.style.background = "transparent"; } }}
+                >
+                  <span style={{ width: 7, height: 7, borderRadius: "50%", background: getBoardColor(board.id), flexShrink: 0 }} />
+                  <span className="truncate">{board.name}</span>
+                </Link>
+              );
+            })
+          )}
         </div>
 
-      
+        {/* User footer */}
+        <div style={{ padding: "14px 14px 0", borderTop: `1px solid ${S.divider}` }}>
+          <button
+            className="flex items-center gap-2.5 w-full rounded-[7px] transition-colors duration-150"
+            style={{ padding: "8px 10px" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = S.hoverBg)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+          >
+            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#c8862a", color: "#1a1714", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              {userInitials}
+            </div>
+            <span className="truncate" style={{ fontSize: 12.5, color: S.user }}>{userName}</span>
+          </button>
+        </div>
       </aside>
     </>
   );
