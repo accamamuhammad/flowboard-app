@@ -68,6 +68,7 @@ export default function BoardsClient({ initialBoards }: BoardsClientProps) {
         boards={boards}
         isOpen={sidebarOpen}
         onClose={() => setSidebar(false)}
+        onNewBoard={() => { setEditBoard(null); setModal(true); }}
       />
 
       <MainContent
