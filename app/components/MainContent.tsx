@@ -22,13 +22,37 @@ export default function MainContent({ boards, onNewBoard, onBoardEdit, onBoardDe
       <div className="flex items-end justify-between" style={{ marginBottom: 40 }}>
         <div className="flex items-center gap-3">
           {!sidebarOpen && (
-            <div
-              onClick={onToggleSidebar}
-              className="lg:hidden"
-              style={{ position: "absolute", left: 0, bottom: 40, zIndex: 50, width: 64, height: 48, borderRadius: "0 999px 999px 0", background: "#f7f3ee", boxShadow: "0 2px 8px rgba(26,23,20,0.15)", display: "flex", alignItems: "center", justifyContent: "flex-end", paddingRight: 6, fontSize: 13, fontWeight: 700, color: "#1a1714", cursor: "pointer" }}
-            >
-              Open
-            </div>
+            <>
+              <style>{`
+                @media (min-width: 1024px) { .sidebar-toggle-pill { display: none !important; } }
+              `}</style>
+              <div
+                onClick={onToggleSidebar}
+                className="sidebar-toggle-pill"
+                style={{
+                  position: "fixed",
+                  left: 0,
+                  bottom: 32,
+                  zIndex: 50,
+                  width: 52,
+                  height: 44,
+                  borderRadius: "0 22px 22px 0",
+                  background: "#1a1714",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  boxShadow: "2px 2px 12px rgba(26,23,20,0.25)",
+                }}
+                aria-label="Toggle sidebar"
+              >
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <span style={{ display: "block", width: 16, height: 1.5, borderRadius: 2, background: "#f7f3ee" }} />
+                  <span style={{ display: "block", width: 12, height: 1.5, borderRadius: 2, background: "#f7f3ee" }} />
+                  <span style={{ display: "block", width: 16, height: 1.5, borderRadius: 2, background: "#f7f3ee" }} />
+                </div>
+              </div>
+            </>
           )}
           <div>
             <p style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "#9c9188", marginBottom: 6 }}>Workspace</p>

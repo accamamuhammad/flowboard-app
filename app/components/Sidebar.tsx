@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { useUser, UserButton } from "@clerk/nextjs";
 import { LayoutGrid, Star, Clock, CheckSquare } from "lucide-react";
 import type { Board } from "@/types/flowboard";
 
@@ -15,8 +16,6 @@ function getBoardColor(id: string) {
 
 interface SidebarProps {
   boards: Board[];
-  userName?: string;
-  userInitials?: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -28,29 +27,31 @@ const NAV_ITEMS = [
   { label: "My Tasks",   icon: CheckSquare, href: "/tasks"   },
 ];
 
-// All colours as plain hex — avoids Tailwind token resolution issues
 const S = {
-  bg:         "#1a1714",
-  border:     "rgba(255,255,255,0.08)",
-  divider:    "rgba(255,255,255,0.07)",
-  label:      "rgba(247,243,238,0.28)",
-  text:       "rgba(247,243,238,0.55)",
-  textHover:  "#f7f3ee",
-  board:      "rgba(247,243,238,0.45)",
-  user:       "rgba(247,243,238,0.70)",
-  activeBg:   "#c8862a",
-  activeText: "#1a1714",
-  hoverBg:    "rgba(255,255,255,0.07)",
+  bg:        "#1a1714",
+  border:    "rgba(255,255,255,0.08)",
+  divider:   "rgba(255,255,255,0.07)",
+  label:     "rgba(247,243,238,0.28)",
+  text:      "rgba(247,243,238,0.55)",
+  paper:     "#f7f3ee",
+  board:     "rgba(247,243,238,0.45)",
+  user:      "rgba(247,243,238,0.70)",
+  activeBg:  "#c8862a",
+  activeText:"#1a1714",
+  hoverBg:   "rgba(255,255,255,0.07)",
 };
 
-export default function Sidebar({ boards, userName = "Alex Okafor", userInitials = "AO", isOpen, onClose }: SidebarProps) {
-  const pathname = usePathname();
+export default function Sidebar({ boards, isOpen, onClose }: SidebarProps) {
+  const pathname    = usePathname();
+  const { user }    = useUser();
 
   useEffect(() => { onClose(); }, [pathname]);
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
+
+  const displayName = user?.fullName ?? user?.firstName ?? "You";
 
   return (
     <>
@@ -63,12 +64,15 @@ export default function Sidebar({ boards, userName = "Alex Okafor", userInitials
       )}
 
       <aside
-        className={`fixed top-0 left-0 z-30 h-full flex flex-col overflow-y-auto lg:static lg:z-auto lg:translate-x-0 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
+        className={`fixed top-0 left-0 z-30 h-full flex flex-col overflow-y-auto
+          lg:static lg:z-auto lg:translate-x-0
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}
         style={{ width: 200, minWidth: 200, background: S.bg, paddingTop: 28, paddingBottom: 24 }}
       >
         {/* Logo */}
         <div style={{ padding: "0 24px 24px", borderBottom: `1px solid ${S.border}`, marginBottom: 20 }}>
-          <div style={{ fontFamily: "'Lora', serif", fontSize: 20, fontWeight: 600, color: "#f7f3ee", letterSpacing: "-0.3px" }}>
+          <div style={{ fontFamily: "'Lora', serif", fontSize: 20, fontWeight: 600, color: S.paper, letterSpacing: "-0.3px" }}>
             Flowboard
           </div>
           <div style={{ fontSize: 10.5, color: S.label, marginTop: 2, letterSpacing: "0.04em" }}>
@@ -88,14 +92,8 @@ export default function Sidebar({ boards, userName = "Alex Okafor", userInitials
                 key={href}
                 href={href}
                 className="flex items-center gap-2.5 rounded-[7px] select-none transition-colors duration-150"
-                style={{
-                  padding: "8px 10px",
-                  fontSize: 13,
-                  background: active ? S.activeBg : "transparent",
-                  color: active ? S.activeText : S.text,
-                  fontWeight: active ? 600 : 400,
-                }}
-                onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = S.hoverBg; e.currentTarget.style.color = S.textHover; } }}
+                style={{ padding: "8px 10px", fontSize: 13, background: active ? S.activeBg : "transparent", color: active ? S.activeText : S.text, fontWeight: active ? 600 : 400 }}
+                onMouseEnter={(e) => { if (!active) { e.currentTarget.style.background = S.hoverBg; e.currentTarget.style.color = S.paper; } }}
                 onMouseLeave={(e) => { if (!active) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = S.text; } }}
               >
                 <Icon size={15} style={{ flexShrink: 0 }} />
@@ -113,7 +111,7 @@ export default function Sidebar({ boards, userName = "Alex Okafor", userInitials
           <div className="flex items-center justify-between" style={{ padding: "0 10px", marginBottom: 6 }}>
             <span style={{ fontSize: 9.5, textTransform: "uppercase", letterSpacing: "0.1em", color: S.label }}>Boards</span>
             {boards.length > 0 && (
-              <span style={{ fontSize: 9.5, color: S.label, fontVariantNumeric: "tabular-nums" }}>{boards.length}</span>
+              <span style={{ fontSize: 9.5, color: S.label }}>{boards.length}</span>
             )}
           </div>
 
@@ -126,16 +124,9 @@ export default function Sidebar({ boards, userName = "Alex Okafor", userInitials
                 <Link
                   key={board.id}
                   href={`/boards/${board.id}`}
-                  className="flex items-center gap-2.5 rounded-[7px] transition-colors duration-150 overflow-hidden"
-                  style={{
-                    padding: "6px 10px",
-                    fontSize: 12.5,
-                    color: active ? "#f7f3ee" : S.board,
-                    background: active ? "rgba(255,255,255,0.09)" : "transparent",
-                    whiteSpace: "nowrap",
-                    textOverflow: "ellipsis",
-                  }}
-                  onMouseEnter={(e) => { if (!active) { e.currentTarget.style.color = S.textHover; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; } }}
+                  className="flex items-center gap-2.5 rounded-[7px] overflow-hidden transition-colors duration-150"
+                  style={{ padding: "6px 10px", fontSize: 12.5, color: active ? S.paper : S.board, background: active ? "rgba(255,255,255,0.09)" : "transparent", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+                  onMouseEnter={(e) => { if (!active) { e.currentTarget.style.color = S.paper; e.currentTarget.style.background = "rgba(255,255,255,0.05)"; } }}
                   onMouseLeave={(e) => { if (!active) { e.currentTarget.style.color = S.board; e.currentTarget.style.background = "transparent"; } }}
                 >
                   <span style={{ width: 7, height: 7, borderRadius: "50%", background: getBoardColor(board.id), flexShrink: 0 }} />
@@ -146,19 +137,58 @@ export default function Sidebar({ boards, userName = "Alex Okafor", userInitials
           )}
         </div>
 
-        {/* User footer */}
+        {/* ── User footer with Clerk UserButton ── */}
         <div style={{ padding: "14px 14px 0", borderTop: `1px solid ${S.divider}` }}>
-          <button
+          <div
             className="flex items-center gap-2.5 w-full rounded-[7px] transition-colors duration-150"
             style={{ padding: "8px 10px" }}
             onMouseEnter={(e) => (e.currentTarget.style.background = S.hoverBg)}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
-            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#c8862a", color: "#1a1714", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              {userInitials}
+            {/* Clerk UserButton — styled to fit the dark sidebar */}
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: {
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                  },
+                  userButtonPopoverCard: {
+                    background: "#1a1714",
+                    border: "1px solid rgba(255,255,255,0.10)",
+                    borderRadius: 14,
+                    boxShadow: "0 16px 40px rgba(0,0,0,0.4)",
+                  },
+                  userButtonPopoverActionButton: {
+                    color: "rgba(247,243,238,0.7)",
+                    fontSize: 13,
+                  },
+                  userButtonPopoverActionButton__signOut: {
+                    color: "#e07070",
+                  },
+                  userButtonPopoverActionButtonText: {
+                    fontSize: 13,
+                  },
+                  userButtonPopoverFooter: {
+                    display: "none",
+                  },
+                },
+              }}
+            />
+
+            {/* Name + email */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div className="truncate" style={{ fontSize: 12.5, color: S.user, fontWeight: 500 }}>
+                {displayName}
+              </div>
+              {user?.primaryEmailAddress && (
+                <div className="truncate" style={{ fontSize: 10.5, color: S.label, marginTop: 1 }}>
+                  {user.primaryEmailAddress.emailAddress}
+                </div>
+              )}
             </div>
-            <span className="truncate" style={{ fontSize: 12.5, color: S.user }}>{userName}</span>
-          </button>
+          </div>
         </div>
       </aside>
     </>
