@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { MoreHorizontal, Plus, Check, Pencil, Trash2, Loader2 } from "lucide-react";
+import { useState, useTransition, useEffect } from "react";
+import { MoreHorizontal, Plus, Check, Pencil, Trash2, Loader2, Star } from "lucide-react";
 import type { Board, Task } from "@/types/flowboard";
 import { TASK_STATUSES } from "@/types/flowboard";
 import { deleteBoard } from "@/actions/boards";
@@ -28,8 +28,29 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
   const [editingTask, setEditTask] = useState<Task | null>(null);
   const [menuOpen, setMenuOpen]    = useState(false);
   const [deleting, setDeleting]    = useState(false);
+  const [starred, setStarred]      = useState(false);
   const [, startTransition]        = useTransition();
   const color                      = getBoardColor(board.id);
+
+  // Sync starred state from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("fb_starred");
+      if (saved) setStarred(new Set(JSON.parse(saved)).has(board.id));
+    } catch {}
+  }, [board.id]);
+
+  function handleToggleStar(e: React.MouseEvent) {
+    e.stopPropagation();
+    const next = !starred;
+    setStarred(next);
+    try {
+      const saved = localStorage.getItem("fb_starred");
+      const set   = new Set<string>(saved ? JSON.parse(saved) : []);
+      next ? set.add(board.id) : set.delete(board.id);
+      localStorage.setItem("fb_starred", JSON.stringify([...set]));
+    } catch {}
+  }
 
   const doneCount = tasks.filter((t) => t.status === "done").length;
   const progress  = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
@@ -139,44 +160,60 @@ export default function BoardCard({ board, onBoardEdit, onBoardDeleted, onTaskSa
               </p>
             </div>
 
-            {/* ⋯ options menu */}
-            <div style={{ position: "relative", flexShrink: 0 }}>
+            {/* Star + options menu */}
+            <div style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
+              {/* Star button — always visible when starred, hover to show when not */}
               <button
                 suppressHydrationWarning
-                onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
-                className="opacity-0 group-hover:opacity-100"
-                style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#9c9188", transition: "opacity 0.15s, background 0.15s", border: "none", background: "transparent", cursor: "pointer" }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "#ede8e0")}
-                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                onClick={handleToggleStar}
+                className={starred ? "" : "opacity-0 group-hover:opacity-100"}
+                style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", border: "none", background: "transparent", cursor: "pointer", color: starred ? "#c8862a" : "#9c9188", transition: "opacity 0.15s, color 0.15s, background 0.15s" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = starred ? "#fdf3e0" : "#ede8e0"; e.currentTarget.style.color = "#c8862a"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = starred ? "#c8862a" : "#9c9188"; }}
+                aria-label={starred ? "Unstar board" : "Star board"}
+                title={starred ? "Unstar board" : "Star board"}
               >
-                <MoreHorizontal size={15} />
+                <Star size={13} fill={starred ? "#c8862a" : "none"} />
               </button>
 
-              {menuOpen && (
-                <>
-                  <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                  <div style={{ position: "absolute", right: 0, top: 32, zIndex: 20, background: "white", borderRadius: 12, border: "1px solid rgba(26,23,20,0.08)", boxShadow: "0 8px 24px rgba(26,23,20,0.14)", width: 140, overflow: "hidden", padding: "4px 0" }}>
-                    <button
-                      onClick={() => { setMenuOpen(false); onBoardEdit(board); }}
-                      className="flex items-center gap-2 w-full"
-                      style={{ padding: "8px 12px", fontSize: 13, color: "#5a5148", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "#f7f3ee")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    >
-                      <Pencil size={13} /> Rename
-                    </button>
-                    <button
-                      onClick={handleDeleteBoard}
-                      className="flex items-center gap-2 w-full"
-                      style={{ padding: "8px 12px", fontSize: 13, color: "#b94040", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "#fce8e8")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    >
-                      <Trash2 size={13} /> Delete board
-                    </button>
-                  </div>
-                </>
-              )}
+              {/* ⋯ options menu */}
+              <div style={{ position: "relative" }}>
+                <button
+                  suppressHydrationWarning
+                  onClick={(e) => { e.stopPropagation(); setMenuOpen((o) => !o); }}
+                  style={{ width: 28, height: 28, borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", color: "#9c9188", transition: "background 0.15s", border: "none", background: "transparent", cursor: "pointer" }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "#ede8e0")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                >
+                  <MoreHorizontal size={15} />
+                </button>
+
+                {menuOpen && (
+                  <>
+                    <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
+                    <div style={{ position: "absolute", right: 0, top: 32, zIndex: 20, background: "white", borderRadius: 12, border: "1px solid rgba(26,23,20,0.08)", boxShadow: "0 8px 24px rgba(26,23,20,0.14)", width: 140, overflow: "hidden", padding: "4px 0" }}>
+                      <button
+                        onClick={() => { setMenuOpen(false); onBoardEdit(board); }}
+                        className="flex items-center gap-2 w-full"
+                        style={{ padding: "8px 12px", fontSize: 13, color: "#5a5148", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "#f7f3ee")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <Pencil size={13} /> Rename
+                      </button>
+                      <button
+                        onClick={handleDeleteBoard}
+                        className="flex items-center gap-2 w-full"
+                        style={{ padding: "8px 12px", fontSize: 13, color: "#b94040", background: "transparent", border: "none", cursor: "pointer", textAlign: "left" }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "#fce8e8")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <Trash2 size={13} /> Delete board
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 

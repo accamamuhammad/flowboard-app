@@ -74,7 +74,6 @@ export default function Sidebar({ boards, isOpen, onClose, onNewBoard }: Sidebar
     { label: "All Boards", icon: LayoutGrid, href: "/boards"  },
     { label: "Starred",    icon: Star,        href: "/starred" },
     { label: "New Board",  icon: Plus,        href: null, action: onNewBoard },
-    { label: "Settings",   icon: Settings,    href: "/settings" },
   ];
 
   return (
