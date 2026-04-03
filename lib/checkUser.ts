@@ -1,6 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "./db";
-import { use } from "react";
 
 // src/lib/checkUser.ts
 export const checkUser = async () => {
