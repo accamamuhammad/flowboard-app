@@ -32,6 +32,7 @@ export interface Board {
   tasks: Task[];
 }
 
+
 // Lightweight version used in sidebar board list
 export type BoardSummary = Pick<Board, "id" | "name">;
 

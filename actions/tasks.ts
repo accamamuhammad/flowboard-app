@@ -1,25 +1,13 @@
 "use server";
 
-// src/actions/tasks.ts
-// Server actions for Task + Subtask CRUD.
-
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 
-// ── Create task ───────────────────────────────────────────────
-export async function createTask(
-  boardId: string,
-  data: { title: string; status?: string }
-) {
+export async function createTask(boardId: string, data: { title: string; status?: string }) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  // Verify board belongs to user
-  const board = await prisma.board.findFirst({ where: { id: boardId, userId } });
-  if (!board) throw new Error("Board not found");
-
-  // Get max order
   const last = await prisma.task.findFirst({
     where: { boardId },
     orderBy: { order: "desc" },
@@ -40,11 +28,7 @@ export async function createTask(
   return task;
 }
 
-// ── Update task ───────────────────────────────────────────────
-export async function updateTask(
-  taskId: string,
-  data: { title?: string; status?: string; order?: number }
-) {
+export async function updateTask(taskId: string, data: { title?: string; status?: string; order?: number }) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
@@ -58,7 +42,6 @@ export async function updateTask(
   return task;
 }
 
-// ── Delete task ───────────────────────────────────────────────
 export async function deleteTask(taskId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -67,7 +50,6 @@ export async function deleteTask(taskId: string) {
   revalidatePath("/boards");
 }
 
-// ── Create subtask ────────────────────────────────────────────
 export async function createSubtask(taskId: string, title: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -80,7 +62,6 @@ export async function createSubtask(taskId: string, title: string) {
   return subtask;
 }
 
-// ── Toggle subtask ────────────────────────────────────────────
 export async function toggleSubtask(subtaskId: string, completed: boolean) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
@@ -94,7 +75,6 @@ export async function toggleSubtask(subtaskId: string, completed: boolean) {
   return subtask;
 }
 
-// ── Delete subtask ────────────────────────────────────────────
 export async function deleteSubtask(subtaskId: string) {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");

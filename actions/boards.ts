@@ -2,7 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
-import { prisma } from "../lib/db";
+import { prisma } from "@/lib/db";
 
 export async function createBoard(name: string) {
   const { userId } = await auth();
