@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useUser, UserButton } from "@clerk/nextjs";
+
 import { LayoutGrid, Star, Plus, Settings } from "lucide-react";
 import type { Board } from "@/types/flowboard";
 
@@ -60,9 +60,9 @@ function useStarredBoards() {
 
 export default function Sidebar({ boards, isOpen, onClose, onNewBoard }: SidebarProps) {
   const pathname           = usePathname();
-  const { user }           = useUser();
+  
   const { starred, toggleStar } = useStarredBoards();
-  const displayName        = user?.fullName ?? user?.firstName ?? "You";
+  const displayName = "My Workspace";
 
   useEffect(() => { onClose(); }, [pathname]);
   useEffect(() => {
@@ -74,6 +74,7 @@ export default function Sidebar({ boards, isOpen, onClose, onNewBoard }: Sidebar
     { label: "All Boards", icon: LayoutGrid, href: "/boards"  },
     { label: "Starred",    icon: Star,        href: "/starred" },
     { label: "New Board",  icon: Plus,        href: null, action: onNewBoard },
+    { label: "Settings",   icon: Settings,    href: "/settings" },
   ];
 
   return (
@@ -175,24 +176,11 @@ export default function Sidebar({ boards, isOpen, onClose, onNewBoard }: Sidebar
             onMouseEnter={e => (e.currentTarget.style.background = S.hoverBg)}
             onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
           >
-            <UserButton
-              appearance={{
-                elements: {
-                  avatarBox: { width: 28, height: 28 },
-                  userButtonPopoverCard: { background: "#1a1714", border: "1px solid rgba(255,255,255,0.10)", borderRadius: 14, boxShadow: "0 16px 40px rgba(0,0,0,0.4)" },
-                  userButtonPopoverActionButton: { color: "rgba(247,243,238,0.7)", fontSize: 13 },
-                  userButtonPopoverActionButton__signOut: { color: "#e07070" },
-                  userButtonPopoverFooter: { display: "none" },
-                },
-              }}
-            />
+            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#c8862a", color: "#1a1714", fontSize: 11, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              F
+            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="truncate" style={{ fontSize: 12.5, color: S.user, fontWeight: 500 }}>{displayName}</div>
-              {user?.primaryEmailAddress && (
-                <div className="truncate" style={{ fontSize: 10.5, color: S.label, marginTop: 1 }}>
-                  {user.primaryEmailAddress.emailAddress}
-                </div>
-              )}
             </div>
           </div>
         </div>

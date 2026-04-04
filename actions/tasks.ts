@@ -1,13 +1,9 @@
 "use server";
 
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 
 export async function createTask(boardId: string, data: { title: string; status?: string }) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
   const last = await prisma.task.findFirst({
     where: { boardId },
     orderBy: { order: "desc" },
@@ -29,56 +25,38 @@ export async function createTask(boardId: string, data: { title: string; status?
 }
 
 export async function updateTask(taskId: string, data: { title?: string; status?: string; order?: number }) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
   const task = await prisma.task.update({
     where: { id: taskId },
     data,
     include: { subtasks: true },
   });
-
   revalidatePath("/boards");
   return task;
 }
 
 export async function deleteTask(taskId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
   await prisma.task.delete({ where: { id: taskId } });
   revalidatePath("/boards");
 }
 
 export async function createSubtask(taskId: string, title: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
   const subtask = await prisma.subtask.create({
     data: { title, taskId },
   });
-
   revalidatePath("/boards");
   return subtask;
 }
 
 export async function toggleSubtask(subtaskId: string, completed: boolean) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
   const subtask = await prisma.subtask.update({
     where: { id: subtaskId },
     data: { completed },
   });
-
   revalidatePath("/boards");
   return subtask;
 }
 
 export async function deleteSubtask(subtaskId: string) {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
-
   await prisma.subtask.delete({ where: { id: subtaskId } });
   revalidatePath("/boards");
 }
