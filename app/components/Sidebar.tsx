@@ -59,7 +59,7 @@ function useStarredBoards() {
 }
 
 export default function Sidebar({ boards, isOpen, onClose, onNewBoard }: SidebarProps) {
-  const pathname           = usePathname();
+  const pathname       = usePathname();
   
   const { starred, toggleStar } = useStarredBoards();
   const displayName = "My Workspace";
