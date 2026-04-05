@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import { getBoardById } from "@/actions/boards";
 import BoardDetailClient from "./BoardDetailClient";

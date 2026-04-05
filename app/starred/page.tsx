@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { getBoards } from "@/actions/boards";
 import StarredClient from "./StarredClient";
 
